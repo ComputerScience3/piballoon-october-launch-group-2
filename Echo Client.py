@@ -16,7 +16,7 @@ __status__ = 'Project Used'
 
 ##Sense Hat code by Computer Science 3 Class of 2017
 ##Special Appearance by Tanvir Towhid
-##Special Thanks to Mr. Hudson
+##Special Thanks to The Evil Dragon King Mr. Hudson
 
 import socket
 import sys
