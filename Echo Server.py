@@ -92,7 +92,7 @@ def parse_message(str):
     return count
 
 def updateDataBase(db, str, balloonID):
-    msg = parse_message(str)
+    ##msg = parse_message(str)
     ##time = msg[0]
     ##temp = msg[1]
     ##humidty = msg[2]
@@ -158,39 +158,19 @@ class ThreadedServer(object):
                 for i in range(clientAmmount):
                     if addresshost == addresses[1] and q[i]:
                         queueHandshake.put(True)
-                
-##                if queue3.qsize() != 0 and q3 :
-##                    queueHandshake.put(True)
-##                    q3 = False
-##                if queue4.qsize() != 0 and q4 :
-##                    queueHandshake.put(True)
-##                    q4 = False
-##                if queue5.qsize() != 0 and q5 :
-##                    queueHandshake.put(True)
-##                    q5 = False
-
 
                 if queueHandshake.full():
                     print('handshake acheived')
                     for i in range(clientAmmount):
                         clients[i].sendall(bytes('in', 'utf-8'))
                         time.sleep(2.0)
-##                    time.sleep(2.0)
-##                    client3.sendall(bytes('in', 'utf-8'))
-##                    time.sleep(2.0)
-##                    client4.sendall(bytes('in', 'utf-8'))
-##                    time.sleep(2.0)
-##                    client5.sendall(bytes('in', 'utf-8'))
-
+                        
             #The server starts a thread for each client.      
             if queueHandshake.full(): #Starts recieving information after all pis are connected
                 print('Thread Start')
                 for i in range(clientAmmount):
                     threading.Thread(target = handler, args = (clients[i], i)).start()
                 threading.Thread(target = queues, args = ()).start()
-##                threading.Thread(target = handler, args = (client3, 3))
-##                threading.Thread(target = handler, args = (client4, 4))
-##                threading.Thread(target = handler, args = (client5, 5))
                 whileFinish = True
             
 
@@ -209,26 +189,6 @@ def queues(): #This is a queue. We use it to queue things.
                     updateDataBase(db, displayStr, 0)
                     db.commit()
                     db.close()
-            
-                #sense.show_message(displayStr, scroll_speed = .1, text_colour = [255, 180, 50],)
-
-##            if not queue3.empty():
-##                displayStr = str(queue3.get(block = True, timeout = None))
-##                displayStr = displayStr[2:len(displayStr)-1]
-##                print(sys.stderr, 'received from 192.168.1.5 : ', displayStr)
-##                sense.show_message(displayStr, scroll_speed = .1, text_colour = [255, 180, 50],)
-##            if not queue4.empty():
-##                displayStr = str(queue4.get(block = True, timeout = None))
-##                displayStr = displayStr[2:len(displayStr)-1]
-##                print(sys.stderr, 'received from 192.168.1.6 : ', displayStr)
-##                sense.show_message(displayStr, scroll_speed = .1, text_colour = [255, 180, 50],)
-##
-##            if not queue5.empty():
-##                displayStr = str(queue5.get(block = True, timeout = None))
-##                displayStr = displayStr[2:len(displayStr)-1]
-##                print(sys.stderr, 'received from 192.168.1.7 : ', displayStr)
-##                sense.show_message(displayStr, scroll_speed = .1, text_colour = [255, 180, 50],)
-
 
 #Each client will put their data in the queue that is reserved for them
 def handler (client, clientNum):
