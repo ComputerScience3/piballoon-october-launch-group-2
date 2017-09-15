@@ -1,22 +1,11 @@
-__author__ = 'Ayush Agrawal, Andrew Bryan, Justin Carter, Christopher DeLaGarza, Deep Desai, Zachray Gray, Joshua Harlan, Ryan Jacobs,'\
-'Ryan King, Iori Koh, Sarath Muddana, Ryan Noeske, Brett Phillips, Devin Popock, Alyssa Rios, Ammar Sheikh, Cosme Tejeda, Ryan Vanek'
-__past_authors_2017__ = 'Kyle Coffey, Zitao Fang, Chris Jung, Taaha Kamal, Maximilian Patrick, Weston Reed, Tanvir Towhid, Vance Vaughn,' \
-                        'Abhi Velaga, Jacob Waller, Colin Zhong'
-_teacher_ = 'Taylor Hudson'
-__credits__ = ['Ayush Agrawal', 'Andrew Bryan', 'Justin Carter', 'Christopher DeLaGarza', 'Deep Desai', 'Zachray Gray',
-               'Joshua Harlan', 'Ryan Jacobs', 'Ryan King', 'Iori Koh', 'Sarath Muddana', 'Ryan Noeske', 'Brett Phillips', 'Devin Popock',
-               'Alyssa Rios', 'Ammar Sheikh', 'Cosme Tejeda', 'Ryan Vanek', 'Kyle Coffey', 'Zitao Fang', 'Chris Jung', 'Taaha Kamal',
-               'Maximilian Patrick', 'Weston Reed', 'Tanvir Towhid', 'Vance Vaughn', 'Abhi Velaga', 'Jacob Waller', 'Colin Zhong', 'Taylor Hudson']
-__copyright__ = 'Copyright 2017, Allen High School Co-cirruclar Project'
-__license__ = 'GPL'
-__version__ = '2.0.5'
-__maintainer__ = 'Christopher DeLaGarza, Deep Desai, Taylor Hudson'
-__email__ = 'Taylor.Hudson@allenisd.org'
-__status__ = 'Project Used'
+## Project by Chris DeLaGarza, Deep Desai, Ryan King, Justin Carter,
+##Ryan Jacobs, Zach Gray, Alyssa Rios, Iori Koh, Josh Harlan, Ayush Agarwal,
+##Ryan Noeske, Cosme Tejada, Devin Popcock, Serath Mudana, Ryan Vanet, Brian Teh,
+##Brett Philips, Ammar Sheikh, Andrew Bryant
 
 ##Sense Hat code by Computer Science 3 Class of 2017
 ##Special Appearance by Tanvir Towhid
-##Special Thanks to The Evil Dragon King Mr. Hudson
+##Special Thanks to Mr. Hudson
 
 import socket
 import sys
@@ -33,7 +22,7 @@ sense.set_imu_config(False, True, False)
 directory = '/'
 videoLength = 60
 camera = None
-filename = strftime('%Y-%m-%d--%H:%M:%S') + '.csv'
+filename = strftime("%Y-%m-%d--%H:%M:%S") + ".csv"
 ## Fields of Data
 fieldnames = ['time', 'temperature', 'humidity', 'pressure', 'pitch', 'roll', 'yaw', 'mag_x', 'mag_y', 'mag_z', 'acc_x', 'acc_y', 'acc_z', 'gyro_x', 'gyro_y', 'gyro_z']
 logfile = None
@@ -44,6 +33,16 @@ printReport = False
 SenseHatAttached = False
 CameraAttached = False
 USBDrive = True
+
+dataPoints = 0
+color = (255,0,255)
+def dataPointsSent():
+        global dataPoints
+        if dataPoints == 64:
+                dataPoints = 0
+                FullScreen(0,255,0)
+        sense.set_pixel(int(dataPoints%8),int(dataPoints/8),color)
+        dataPoints += 1
 
 ## Set up File to store collected data
 if(printReport):
@@ -104,7 +103,6 @@ class myThread(Thread):
             if(CameraAttached):
                 CAM()
         elif self.name == 'VID':
-            REPORT()
             if(CameraAttached):
                 VIDEO()
         else:
@@ -126,16 +124,17 @@ def REPORT():
         gyro = sense.get_gyroscope_raw()
 
         #send data to server
-        finalData = strftime('%Y-%m-%d %H:%M:%S') + ',' + str(temp) + ',' + str(humidity) + ',' + str(pressure) + ',' + '{pitch}'.format(**orientation) + ',' + '{roll}'.format(**orientation) + ',' + '{yaw}'.format(**orientation) + ',' + '{x}'.format(**mag) + ',' + '{y}'.format(**mag) + ',' + '{z}'.format(**mag) + ',' + '{x}'.format(**acc) + ',' + '{y}'.format(**acc) + ',' + '{z}'.format(**acc) + ',' + '{x}'.format(**gyro) + ',' + '{y}'.format(**gyro) + ',' + '{z}'.format(**gyro) + ','
+        finalData = strftime("%Y-%m-%d %H:%M:%S") + ',' + str(temp) + ',' + str(humidity) + ',' + str(pressure) + ',' + '{pitch}'.format(**orientation) + ',' + '{roll}'.format(**orientation) + ',' + '{yaw}'.format(**orientation) + ',' + '{x}'.format(**mag) + ',' + '{y}'.format(**mag) + ',' + '{z}'.format(**mag) + ',' + '{x}'.format(**acc) + ',' + '{y}'.format(**acc) + ',' + '{z}'.format(**acc) + ',' + '{x}'.format(**gyro) + ',' + '{y}'.format(**gyro) + ',' + '{z}'.format(**gyro) + ','
         finalData = str(finalData)
         print(finalData)
-        print(sock.sendall(bytes(finalData, 'utf-8')))
+        print(sock.sendall(bytes((finalData), 'utf-8')))
+        dataPointsSent()
 
         #print report on file
         #var printReport is a boolean turned off during testing. Only turned on during real run
         if(printReport):	
                 logwriter.writerow({
-                'time': strftime('%Y-%m-%d %H:%M:%S'),
+                'time': strftime("%Y-%m-%d %H:%M:%S"),
                 'temperature': str(temp), #This means temperature in Spanish.
                 'humidity': str(humidity),
                 'pressure': str(pressure),
@@ -152,9 +151,9 @@ def camDir():
 def vidDir():
     return directory
 def CAM():
-    camera.capture(camDir() + TimeStamp()+'.jpeg')
+    camera.capture(camDir() + TimeStamp()+".jpeg")
 def TimeStamp():
-    return strftime('%Y-%m-%d %H:%M:%S', gmtime())
+    return strftime("%Y-%m-%d %H:%M:%S", gmtime())
 def VIDEO():
     camera.start_recording(vidDir() + TimeStamp() + '.h264')
     sleep(videoLength)
@@ -169,18 +168,18 @@ def Vid(extradata):
     return extradata
 ## Mount a USBDrive to the Pi and send data to that USB instead of saving on the Pi and using it's memory
 def writtenOSUSB():
-    partitionsFile = open('/proc/partitions')
+    partitionsFile = open("/proc/partitions")
     lines = partitionsFile.readlines()[2:]#Skips the header lines
     for line in lines:
         words = [x.strip() for x in line.split()]
         minorNumber = int(words[1])
         deviceName = words[3]
         if minorNumber % 16 == 0:
-            path = '/sys/class/block/' + deviceName
+            path = "/sys/class/block/" + deviceName
             if os.path.realpath(path):
-                if os.path.realpath(path).find('/usb') > 0:
-                    print('/dev/%s' % deviceName)
-                    return '/dev/%s' % deviceName
+                if os.path.realpath(path).find("/usb") > 0:
+                    print("/dev/%s" % deviceName)
+                    return "/dev/%s" % deviceName
 
 if(CameraAttached):
 	camera.resolution = (1024,768)
@@ -190,6 +189,7 @@ if(USBDrive):
 
 handshake = False
 a = 0
+FullScreen(0,255,0)
 
 try:
         while True:
@@ -198,7 +198,7 @@ try:
                 #Once the handshake is achieved the client will send the sensehat data to server
                 while not handshake:
                     
-                    message = bytes('hi', 'utf-8')
+                    message = bytes('', "utf-8")
                     print (sys.stderr, 'sending %s' % message)
                     sock.sendall(message)
                     
@@ -218,9 +218,8 @@ try:
                 while count < 12:
                     thread1 = myThread(count)
                     count += 1
-                    sleep(5)
+                    sleep(10)
 
-#finally
 finally: #for the final part
         print ('closing socket') #the final thing printed
         sock.close() #finally done
